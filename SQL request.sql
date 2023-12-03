@@ -1,4 +1,5 @@
-Создаем исходные таблицы и импортируем данные из CSV:
+
+--Создаем исходные таблицы 
 
 CREATE TABLE if not exists austin_bikeshare_trips (
 
@@ -42,7 +43,13 @@ CREATE TABLE if not exists austin_bikeshare_stations(
     status varchar(255)
 );
 
-Формируем таблицы с заданным содержанием для заданных годов:
+--Импортируем данные из CSV:
+
+COPY public.stations
+FROM '/docker-entrypoint-initdb.d/austin_bikeshare_stations.csv'
+CSV HEADER;
+
+/*Формируем таблицы с заданным содержанием для заданных годов:
 
     уникальный идентификатор станции
 
@@ -54,7 +61,7 @@ CREATE TABLE if not exists austin_bikeshare_stations(
 
     средняя продолжительность поездок начавшихся в данной станции в данном году
 
-    средняя продолжительность поездок завершившихся в данной станции в данном году
+    средняя продолжительность поездок завершившихся в данной станции в данном году*/
 
 CREATE TABLE year_2013 AS
 SELECT 
@@ -120,14 +127,3 @@ FROM austin_bikeshare_trips
 JOIN austin_bikeshare_stations ON austin_bikeshare_trips.start_station_id = austin_bikeshare_stations.station_id
 WHERE status = 'active' AND EXTRACT(YEAR FROM start_time) = 2017
 GROUP BY start_station_id;
-
-Запрос для вывода названий 10 станций с самым высоким показателем средней продолжительности начавшихся поездок за 2016 год
-SELECT 
-    start_station_id AS station_id,
-    AVG(duration_minutes) AS avg_started_trip_duration
-FROM austin_bikeshare_trips
-JOIN austin_bikeshare_stations ON austin_bikeshare_trips.start_station_id = austin_bikeshare_stations.station_id
-WHERE status = 'active' AND EXTRACT(YEAR FROM start_time) = 2016
-GROUP BY start_station_id
-ORDER BY avg_started_trip_duration DESC
-LIMIT 10;

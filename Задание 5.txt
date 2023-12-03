@@ -1,0 +1,10 @@
+--Запрос для вывода названий 10 станций с самым высоким показателем средней продолжительности начавшихся поездок за 2016 год
+SELECT 
+    start_station_id AS station_id,
+    AVG(duration_minutes) AS avg_started_trip_duration
+FROM austin_bikeshare_trips
+JOIN austin_bikeshare_stations ON austin_bikeshare_trips.start_station_id = austin_bikeshare_stations.station_id
+WHERE status = 'active' AND EXTRACT(YEAR FROM start_time) = 2016
+GROUP BY start_station_id
+ORDER BY avg_started_trip_duration DESC
+LIMIT 10;
